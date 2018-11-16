@@ -22,18 +22,17 @@ struct median_queue_t {
  *
  * ARGUMENTS
  * signal: pointer to first element of an array
- * start: index of the lower boundary where the permutation takes effect in the subarray.
- * length: index of the top boundary where the permutation takes effect in the subarray.
+ * length: length of the array
  *
  * RETURN
  * Index of the pivot in the permutated array.
  * --------------------------------------------------------------------*/
 static size_t partition(double* signal, size_t length){
 
-    double pivot = signal[length];
+    double pivot = signal[length-1];
     size_t i = 0;
 
-    for(size_t j = 0; j < length; j++){
+    for(size_t j = 0; j < length-1; j++){
         if(signal[j] <= pivot){
             i++;
             double tmp = signal[i-1];
@@ -41,8 +40,8 @@ static size_t partition(double* signal, size_t length){
             signal[j] = tmp;
         }
     }
-    double tmp = signal[length];
-    signal[length] = signal[i];
+    double tmp = signal[length-1];
+    signal[length-1] = signal[i];
     signal[i] = tmp;
 	return i;
 }
@@ -53,13 +52,13 @@ static size_t partition(double* signal, size_t length){
  *
  * ARGUMENTS
  * signal: pointer to first element of an array
- * length: index of the top boundary of the array
+ * length: length of the array
  * med: index of the initial signal's median
  *
  * --------------------------------------------------------------------*/
 static void quickMed(double* signal, size_t length, size_t med){
     if(length > 1){
-        size_t pivot = partition(signal, length-1);
+        size_t pivot = partition(signal, length);
 
         if(pivot > med)
             return quickMed(signal, pivot, med);
