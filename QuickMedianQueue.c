@@ -23,17 +23,17 @@ struct median_queue_t {
  * ARGUMENTS
  * signal: pointer to first element of an array
  * start: index of the lower boundary where the permutation takes effect in the subarray.
- * end: index of the top boundary where the permutation takes effect in the subarray.
+ * length: index of the top boundary where the permutation takes effect in the subarray.
  *
  * RETURN
  * Index of the pivot in the permutated array.
  * --------------------------------------------------------------------*/
-static size_t partition(double* signal, size_t end){
+static size_t partition(double* signal, size_t length){
 
-    double pivot = signal[end];
+    double pivot = signal[length];
     size_t i = 0;
 
-    for(size_t j = 0; j < end; j++){
+    for(size_t j = 0; j < length; j++){
         if(signal[j] <= pivot){
             i++;
             double tmp = signal[i-1];
@@ -41,8 +41,8 @@ static size_t partition(double* signal, size_t end){
             signal[j] = tmp;
         }
     }
-    double tmp = signal[end];
-    signal[end] = signal[i];
+    double tmp = signal[length];
+    signal[length] = signal[i];
     signal[i] = tmp;
 	return i;
 }
@@ -53,18 +53,18 @@ static size_t partition(double* signal, size_t end){
  *
  * ARGUMENTS
  * signal: pointer to first element of an array
- * end: index of the top boundary of the array
+ * length: index of the top boundary of the array
  * med: index of the initial signal's median
  *
  * --------------------------------------------------------------------*/
-static void quickMed(double* signal, size_t end, size_t med){
-    if(end > 1){
-        size_t pivot = partition(signal, end-1);
+static void quickMed(double* signal, size_t length, size_t med){
+    if(length > 1){
+        size_t pivot = partition(signal, length-1);
 
         if(pivot > med)
             return quickMed(signal, pivot, med);
         if(pivot < med)
-            return quickMed(signal+pivot+1, end-(pivot+1), med-(pivot+1));
+            return quickMed(signal+pivot+1, length-(pivot+1), med-(pivot+1));
 	}
     return;
 }
