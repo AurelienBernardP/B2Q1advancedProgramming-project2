@@ -68,27 +68,23 @@ void mqUpdate(MedianQueue* mq, double value) {
 	mq->start = (mq->start + 1) % mq->size;
 
 	size_t i = 0;
-	while(i < mq->size && old != mq->sorted[i]){
-		i++;}
+	while(i < mq->size && old != mq->sorted[i])
+		i++;
 	mq->sorted[i] = value;
 
 	if(i != 0){
-		if( mq->sorted[i-1] > value){
-			while(i > 0 && mq->sorted[i-1] > value){
-				mq->sorted[i] = mq->sorted[i-1];
-				mq->sorted[i-1] = value;
-				i--;
-			}
+		while(i > 0 && mq->sorted[i-1] > value){
+			mq->sorted[i] = mq->sorted[i-1];
+			mq->sorted[i-1] = value;
+			i--;
 		}
 	}
 
 	if(i != mq->size-1){
-		if(mq->sorted[i+1] < value){
-			while (i < mq->size-1 && mq->sorted[i+1] < value){
-				mq->sorted[i] = mq->sorted[i+1];
-				mq->sorted[i+1] = value;
-				i++;
-			}
+		while (i < mq->size-1 && mq->sorted[i+1] < value){
+			mq->sorted[i] = mq->sorted[i+1];
+			mq->sorted[i+1] = value;
+			i++;
 		}
 	}
 }
