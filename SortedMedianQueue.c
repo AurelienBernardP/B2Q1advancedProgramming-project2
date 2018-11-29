@@ -12,15 +12,6 @@ struct median_queue_t {
 	size_t start;
 };
 
-/* ------------------------------------------------------------------------- *
- * Double comparison function.
- * ------------------------------------------------------------------------- */
-static int compareDouble(const void* d1, const void* d2);
-static int compareDouble(const void* d1, const void* d2) {
-	double diff = (*(double*) d2 - *(double*) d1);
-	return diff > 0 ? -1 : (diff < 0 ? 1 : 0);
-}
-
 MedianQueue* mqCreate(const double* values, size_t size) {
 	// create the median queue
 	MedianQueue* mq = malloc(sizeof(MedianQueue));
