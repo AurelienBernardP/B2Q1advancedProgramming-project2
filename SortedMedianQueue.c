@@ -50,8 +50,14 @@ MedianQueue* mqCreate(const double* values, size_t size) {
 		mq->sorted[i] = values[i];
 	}
 
-	qsort(mq->sorted, mq->size, sizeof(double), compareDouble);
-
+    size_t j;
+    double tmp;
+    for (size_t i = 0; i < mq->size; i++){
+        tmp = mq->sorted[i];
+        for(j = i; j > 0 && mq->sorted[j-1] > tmp; j--)
+            mq->sorted[j] = mq->sorted[j-1];
+        mq->sorted[j]=tmp;
+    }
 	return mq;
 }
 
