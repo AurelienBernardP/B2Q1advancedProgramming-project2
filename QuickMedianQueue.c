@@ -61,9 +61,9 @@ static void quickMed(double* signal, size_t length, size_t med){
         size_t pivot = partition(signal, length);
 
         if(pivot > med)
-            return quickMed(signal, pivot, med);
+            quickMed(signal, pivot, med);
         if(pivot < med)
-            return quickMed(signal+pivot+1, length-pivot-1, med-(pivot+1));
+            quickMed(signal+pivot+1, length-pivot-1, med-(pivot+1));
 	}
     return;
 }
@@ -71,9 +71,9 @@ static void quickMed(double* signal, size_t length, size_t med){
 MedianQueue* mqCreate(const double* values, size_t size){
     // create the median queue
     MedianQueue* mq = malloc(sizeof(MedianQueue));
-    if(!mq)
+    if(!mq){
         return NULL;
-
+    }
  	mq->size = size;
  	mq->start = 0;
 
@@ -123,4 +123,4 @@ double mqMedian(const MedianQueue* mq) {
     if (!mq)
  	    return INFINITY;
     return mq->sorted[mq->size / 2];
- }
+}
