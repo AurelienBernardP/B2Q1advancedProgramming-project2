@@ -41,6 +41,7 @@ MedianQueue* mqCreate(const double* values, size_t size) {
 		mq->sorted[i] = values[i];
 	}
 
+	// Sorts the array $mq->sorted$ (insertion sort)
     size_t j;
     double tmp;
     for (size_t i = 0; i < mq->size; i++){
@@ -60,15 +61,21 @@ void mqFree(MedianQueue* mq) {
 
 void mqUpdate(MedianQueue* mq, double value) {
 	if (!mq) { return; }
+
+	//Insert the new value
 	double old = mq->circular[mq->start];
 	mq->circular[mq->start] = value;
 	mq->start = (mq->start + 1) % mq->size;
 
+
+	//Replace the oldest value with the newest
 	size_t i = 0;
 	while(i < mq->size && old != mq->sorted[i])
 		i++;
 	mq->sorted[i] = value;
 
+
+	//Sorts the new array $mq->sorted$
 	if(i != 0){
 		while(i > 0 && mq->sorted[i-1] > value){
 			mq->sorted[i] = mq->sorted[i-1];
@@ -76,7 +83,6 @@ void mqUpdate(MedianQueue* mq, double value) {
 			i--;
 		}
 	}
-
 	if(i != mq->size-1){
 		while (i < mq->size-1 && mq->sorted[i+1] < value){
 			mq->sorted[i] = mq->sorted[i+1];
