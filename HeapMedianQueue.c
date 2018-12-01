@@ -1,9 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
-#include <stdio.h>
 
 #include "MedianQueue.h"
-
 
 /* ------------------------------------------------------------------------- *
  * Structure
@@ -123,6 +121,10 @@ static void minHeapify(MedianQueue* mq, size_t NodeIndex, size_t end){
     size_t LeftSon = NodeIndex*2;
     size_t RightSon = (NodeIndex * 2 + 1);
     size_t IndexOfSmallest = NodeIndex;
+    if(NodeIndex == 0){
+        LeftSon = 1;
+        RightSon = 2;
+    }
 
     if((LeftSon < end) && ((mq->minHeap[LeftSon].value) < (mq->minHeap[NodeIndex].value))){
         IndexOfSmallest = LeftSon;     
@@ -148,13 +150,16 @@ static void minHeapify(MedianQueue* mq, size_t NodeIndex, size_t end){
  * ------------------------------------------------------------------------- */
 static void maxHeapify(MedianQueue* mq, size_t NodeIndex, size_t end){
 	if (!mq){
-        printf("structure empty\n");
         return;
     }
 
     size_t LeftSon = NodeIndex*2;
     size_t RightSon = (NodeIndex * 2 + 1);
     size_t IndexOfLargest = NodeIndex;
+    if(NodeIndex == 0){
+        LeftSon = 1;
+        RightSon = 2;
+    }
 
     if((LeftSon < end) && ((mq->maxHeap[LeftSon].value) > (mq->maxHeap[NodeIndex].value))){
         IndexOfLargest = LeftSon;
@@ -180,7 +185,6 @@ static void maxHeapify(MedianQueue* mq, size_t NodeIndex, size_t end){
  * ------------------------------------------------------------------------- */
 static void pushUpInMinHeap(MedianQueue* mq, size_t nodeIndex, size_t end){
     if (!mq){
-        printf("structure empty\n");
         return;
     }
     if(nodeIndex >= end || nodeIndex == 0){
@@ -209,7 +213,6 @@ static void pushUpInMinHeap(MedianQueue* mq, size_t nodeIndex, size_t end){
  * ------------------------------------------------------------------------- */
 static void pushUpInMaxHeap(MedianQueue* mq, size_t nodeIndex, size_t end){
     if (!mq){
-        printf("structure empty\n");
         return;
     }
 
@@ -243,21 +246,6 @@ static void BuildMaxHeap(MedianQueue* mq, size_t end){
     return;
 }
 
-/* ------------------------------------------------------------------------- *
- * Builds a min heap in an array.
- *
- * PARAMETERS
- * mq             A median queue object.
- * end            End position of the min heap to be build
- *
- * ------------------------------------------------------------------------- */
-static void BuildMinHeap(MedianQueue* mq, size_t end){
-
-    for(long int i = (end/2); i >= 0; i-- ){
-        minHeapify(mq, i, end);
-    }
-    return;
-}
 
 /* ------------------------------------------------------------------------- *
  * Double comparison function.
@@ -319,7 +307,6 @@ MedianQueue* mqCreate(const double* values, size_t size) {
 
     //build the maxheap of w/2 smallest values and minHeap of w/2 largest values.
     BuildMaxHeap(mq, (long int)(mq->size/2)+1);
-    BuildMinHeap(mq, (long int)mq->size/2);
 
 	return mq;
 }
@@ -340,24 +327,24 @@ MedianQueue* mqCreate(const double* values, size_t size) {
 static int determinPlace(MedianQueue* mq, double value){
     if (!mq) { return -1; }
 
-    if(value > mq->maxHeap[0].value){
-        //value belongs in min heap
+    if(mq->circular[mq->start].heapAddrs == mq->maxHeap){
+        //out value is in max heap
         
-        if(mq->circular[mq->start].heapAddrs == mq->maxHeap){
-            //out value is in max heap
+        if(value >= mq->minHeap[0].value){
+            //new value belongs in min heap
             return 1;
         }else{
-            //out value is in min heap
+            //new value belongs in max heap  
             return 2;
         }
     }else{
-        //value belongs in max heap       
+        //out value is in min heap       
         
-        if(mq->circular[mq->start].heapAddrs == mq->maxHeap){
-            //out value is in max heap  
+        if(value <= mq->maxHeap[0].value){
+             //new value belongs in max heap   
             return 3;  
         }else{
-            //out value is in min heap
+            //new value belongs in min heap
             return 4;
         }        
     }
@@ -390,23 +377,22 @@ static int heapReplace(MedianQueue* mq, double value, int placeOfNewValue){
             minHeapify(mq, mq->circular[mq->start].indexInHeaps, (mq->size/2));//push value down
             break;
         case 2:
-            mq->minHeap[mq->circular[mq->start].indexInHeaps].value = value;
-            pushUpInMinHeap(mq, mq->circular[mq->start].indexInHeaps, mq->size/2);
-            minHeapify(mq, mq->circular[mq->start].indexInHeaps, (mq->size/2));
-            break;
-        case 3:
             mq->maxHeap[mq->circular[mq->start].indexInHeaps].value = value;
             pushUpInMaxHeap(mq, mq->circular[mq->start].indexInHeaps, (mq->size/2)+1);
             maxHeapify(mq, mq->circular[mq->start].indexInHeaps, (mq->size/2)+1);
             break;
-        case 4:
+        case 3:
             mq->minHeap[mq->circular[mq->start].indexInHeaps].value = value;
-            pushUpInMinHeap(mq, mq->circular[mq->start].indexInHeaps, (mq->size/2)+1);
+            pushUpInMinHeap(mq, mq->circular[mq->start].indexInHeaps, (mq->size/2));
             swapBetweenHeaps(mq, 0,0);
             maxHeapify(mq, mq->circular[mq->start].indexInHeaps, (mq->size/2)+1);
             break;
+        case 4:
+            mq->minHeap[mq->circular[mq->start].indexInHeaps].value = value;
+            pushUpInMinHeap(mq, mq->circular[mq->start].indexInHeaps, mq->size/2);
+            minHeapify(mq, mq->circular[mq->start].indexInHeaps, (mq->size/2));
+            break;
         default:
-            printf("error detecting position in heaps of new value\n");
             return -1;
     }
     return 0;
